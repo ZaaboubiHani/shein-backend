@@ -7,6 +7,7 @@ const userJwt = require("../middlewares/userJwt");
 router.post("/", productController.createProduct);
 router.post("/many", productController.createProducts);
 router.get("/", productController.getAllProducts);
+router.get("/random", productController.getRandomProducts);
 router.put("/:id", productController.updateProduct);
 router.get("/single", productController.getOneProduct);
 
