@@ -9,7 +9,7 @@ const getAllProducts = async (req, res) => {
     const sizes = req.query.sizes ?? [];
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
-    const name = req.query.name;
+    const sortAsc = req.query.sort === 'true';
     // Initialize query object
     const query = {
       isDrafted: false,
@@ -25,16 +25,11 @@ const getAllProducts = async (req, res) => {
       query.size = { $in: sizes }; // Use $in operator for multiple sizes
     }
 
-    // Add name filter with regex
-    if (name) {
-      query.name = { $regex: new RegExp(name, "i") };
-    }
-
     // Pagination and sorting options
     const options = {
       page,
       limit,
-      sort: { createdAt: -1 },
+      sort: sortAsc ? { buyPrice: 1 } : { buyPrice: -1 },
     };
 
     // Fetch products with pagination
@@ -77,25 +72,25 @@ const getRandomProducts = async (req, res) => {
       { $sample: { size: randomNumber } }, // Randomly sample 10 products
       {
         $lookup: {
-          from: 'categories', // This should match the name of the collection for categories
-          localField: 'category',
-          foreignField: '_id',
-          as: 'category',
+          from: "categories", // This should match the name of the collection for categories
+          localField: "category",
+          foreignField: "_id",
+          as: "category",
         },
       },
       {
         $lookup: {
-          from: 'files', // This should match the name of the collection for files
-          localField: 'image', // Adjust this field if necessary
-          foreignField: '_id',
-          as: 'image',
+          from: "files", // This should match the name of the collection for files
+          localField: "image", // Adjust this field if necessary
+          foreignField: "_id",
+          as: "image",
         },
       },
-      { $unwind: { path: '$image', preserveNullAndEmptyArrays: true } }, // Unwind the image array to return as an object
-      { $unwind: { path: '$category', preserveNullAndEmptyArrays: true } }, // Unwind the category array to return as an object
+      { $unwind: { path: "$image", preserveNullAndEmptyArrays: true } }, // Unwind the image array to return as an object
+      { $unwind: { path: "$category", preserveNullAndEmptyArrays: true } }, // Unwind the category array to return as an object
       {
         $addFields: {
-          'imageUrl': { $concat: [baseUrl, '$image.url'] },
+          imageUrl: { $concat: [baseUrl, "$image.url"] },
         },
       },
     ]);
@@ -107,9 +102,6 @@ const getRandomProducts = async (req, res) => {
     res.status(500).send("Error retrieving random Products.");
   }
 };
-
-
-
 
 const generateBarcode = async () => {
   let barcode;
