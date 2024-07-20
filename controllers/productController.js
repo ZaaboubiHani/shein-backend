@@ -67,6 +67,50 @@ const getAllProducts = async (req, res) => {
   }
 };
 
+const getRandomProducts = async (req, res) => {
+  try {
+    const randomNumber = 10; // Number of random products to fetch
+    const baseUrl = process.env.BASE_URL;
+
+    const products = await Product.aggregate([
+      { $match: { isDrafted: false } }, // Ensure only non-drafted products are considered
+      { $sample: { size: randomNumber } }, // Randomly sample 10 products
+      {
+        $lookup: {
+          from: 'categories', // This should match the name of the collection for categories
+          localField: 'category',
+          foreignField: '_id',
+          as: 'category',
+        },
+      },
+      {
+        $lookup: {
+          from: 'files', // This should match the name of the collection for files
+          localField: 'image', // Adjust this field if necessary
+          foreignField: '_id',
+          as: 'image',
+        },
+      },
+      { $unwind: { path: '$image', preserveNullAndEmptyArrays: true } }, // Unwind the image array to return as an object
+      { $unwind: { path: '$category', preserveNullAndEmptyArrays: true } }, // Unwind the category array to return as an object
+      {
+        $addFields: {
+          'imageurl': { $concat: [baseUrl, '/', '$image.url'] },
+        },
+      },
+    ]);
+
+    // Send response
+    res.status(200).json(products);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error retrieving random Products.");
+  }
+};
+
+
+
+
 const generateBarcode = async () => {
   let barcode;
   let isUnique = false;
@@ -217,6 +261,7 @@ const getOneProduct = async (req, res) => {
 
 module.exports = {
   getAllProducts,
+  getRandomProducts,
   updateProduct,
   getOneProduct,
   createProduct,
