@@ -95,7 +95,7 @@ const getRandomProducts = async (req, res) => {
       { $unwind: { path: '$category', preserveNullAndEmptyArrays: true } }, // Unwind the category array to return as an object
       {
         $addFields: {
-          'imageurl': { $concat: [baseUrl, '/', '$image.url'] },
+          'imageurl': { $concat: [baseUrl, '$image.url'] },
         },
       },
     ]);
