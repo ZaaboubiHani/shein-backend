@@ -51,19 +51,13 @@ const deleteComment = async (req, res) => {
 const getComments = async (req, res) => {
   try {
     const productId = req.query.product;
-
     if (!productId) {
       return res.status(400).send({ message: "Product ID is required" });
     }
 
     const comments = await Comment.find({ product: productId });
 
-    if (comments.length === 0) {
-      return res
-        .status(404)
-        .send({ message: "No comments found for this product" });
-    }
-
+   
     res.send(comments);
   } catch (err) {
     res.status(500).send({
