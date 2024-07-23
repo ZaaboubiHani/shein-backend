@@ -9,7 +9,7 @@ const getAllProducts = async (req, res) => {
     const sizes = req.query.sizes ?? [];
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
-    const sortAsc = req.query.sort === 'true';
+    const sortAsc = req.query.sort === "true";
     // Initialize query object
     const query = {
       isDrafted: false,
@@ -234,8 +234,8 @@ const updateProduct = async (req, res) => {
     console.error(error);
   }
 };
+
 const getOneProduct = async (req, res) => {
-  const barcode = req.query.barcode;
   try {
     const product = await Product.findOne({ barcode: barcode }).populate([
       { path: "category", select: "name discount" },
@@ -244,6 +244,26 @@ const getOneProduct = async (req, res) => {
     if (!product) {
       return res.status(404).json({ error: "Product not found" });
     }
+    const singleProduct = product.toObject();
+    const file = await File.findById(singleProduct?.image);
+    singleProduct.imageUrl = file?.url;
+    res.status(200).json(product);
+  } catch (error) {
+    res.status(500).json({ error: "Error getting Product" });
+    console.error(error);
+  }
+};
+
+const getSingleProduct = async (req, res) => {
+  const productId = req.params.id;
+  try {
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+    const singleProduct = product.toObject();
+    const file = await File.findById(singleProduct?.image);
+    singleProduct.imageUrl = file?.url;
     res.status(200).json(product);
   } catch (error) {
     res.status(500).json({ error: "Error getting Product" });
@@ -258,4 +278,5 @@ module.exports = {
   getOneProduct,
   createProduct,
   createProducts,
+  getSingleProduct,
 };

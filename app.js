@@ -43,6 +43,7 @@ const customerRoutes = require("./routes/customerRoutes");
 const passwordRoutes = require("./routes/passwordRoutes");
 const posterRoutes = require("./routes/posterRoutes");
 const fileRoutes = require("./routes/fileRoutes");
+const commentRoutes = require("./routes/commentRoutes");
 
 const api = process.env.API_URL;
 
@@ -58,6 +59,7 @@ app.use("/discounts", discountRoutes);
 app.use("/customers", customerRoutes);
 app.use("/passwords", passwordRoutes);
 app.use("/posters", posterRoutes);
+app.use("/comments", commentRoutes);
 app.use("/uploads/posters", express.static("uploads/posters/"));
 app.use("/upload", fileRoutes);
 app.use("/uploads", express.static("uploads"));

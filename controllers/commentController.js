@@ -47,7 +47,28 @@ const deleteComment = async (req, res) => {
   }
 };
 
+// Get comments by product ID
+const getComments = async (req, res) => {
+  try {
+    const productId = req.query.product;
+    if (!productId) {
+      return res.status(400).send({ message: "Product ID is required" });
+    }
+
+    const comments = await Comment.find({ product: productId });
+
+   
+    res.send(comments);
+  } catch (err) {
+    res.status(500).send({
+      message: "Error occurred while retrieving comments",
+      error: err.message,
+    });
+  }
+};
+
 module.exports = {
   createComment,
   deleteComment,
+  getComments,
 };
