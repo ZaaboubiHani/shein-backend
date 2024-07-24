@@ -257,19 +257,20 @@ const getOneProduct = async (req, res) => {
 const getSingleProduct = async (req, res) => {
   const productId = req.params.id;
   try {
-    const product = await Product.findById(productId);
+    const product = await Product.findById(productId).populate('category'); // populate the category reference
     if (!product) {
       return res.status(404).json({ error: "Product not found" });
     }
     const singleProduct = product.toObject();
     const file = await File.findById(singleProduct?.image);
     singleProduct.imageUrl = file?.url;
-    res.status(200).json(product);
+    res.status(200).json(singleProduct); // ensure singleProduct is sent instead of product
   } catch (error) {
     res.status(500).json({ error: "Error getting Product" });
     console.error(error);
   }
 };
+
 
 module.exports = {
   getAllProducts,
