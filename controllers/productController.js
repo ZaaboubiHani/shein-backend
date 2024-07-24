@@ -1,15 +1,15 @@
 const Product = require("../models/product");
 const Category = require("../models/category");
 const File = require("../models/file");
-
 const getAllProducts = async (req, res) => {
   try {
     // Extract query parameters
-    const categoryIds = req.query.categories ?? []; // Expect a comma-separated list of IDs
-    const sizes = req.query.sizes ?? [];
+    const categoryIds = req.query.categories ? req.query.categories.split(',') : []; // Expect a comma-separated list of IDs
+    const sizes = req.query.sizes ? req.query.sizes.split(',') : [];
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const sortAsc = req.query.sort === "true";
+    
     // Initialize query object
     const query = {
       isDrafted: false,
@@ -30,6 +30,7 @@ const getAllProducts = async (req, res) => {
       page,
       limit,
       sort: sortAsc ? { buyPrice: 1 } : { buyPrice: -1 },
+      populate: 'category', // Populate the category reference
     };
 
     // Fetch products with pagination
