@@ -30,7 +30,10 @@ const getAllProducts = async (req, res) => {
       page,
       limit,
       sort: sortAsc ? { buyPrice: 1 } : { buyPrice: -1 },
-      populate: 'category', // Populate the category reference
+      populate: [
+        { path: 'category' }, // Populate the category reference
+        { path: 'arrival' }   // Populate the arrival reference
+      ],
     };
 
     // Fetch products with pagination
